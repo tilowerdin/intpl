@@ -1,5 +1,12 @@
 module Type
-  ( VarIndex, Term(..), Rule(..), Prog(..), Goal(..)
+  ( VarIndex, 
+    Term(..), 
+    Rule(..), 
+    Prog(..), 
+    Goal(..), 
+    Subst(..), 
+    SLDTree(..),
+    Strategy(..)
   ) where
 
 -- Alias type for variables
@@ -21,3 +28,13 @@ data Prog = Prog [Rule]
 data Goal = Goal [Term]
   deriving Show
 
+-- Data type for Substitutions
+data Subst = Subst [(VarIndex, Term)]
+  deriving Show
+
+-- Data type for SLD Trees
+data SLDTree = SLDTree Goal [(Subst, SLDTree)]
+  deriving Show
+
+-- Data type for a strategy
+type Strategy = SLDTree -> [Subst]

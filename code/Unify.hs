@@ -14,7 +14,8 @@ ds t1@(Comb s1 l1) t2@(Comb s2 l2)
   | s1 /= s2  = Just (t1,t2)
   | otherwise = compare l1 l2
   where
-    compare []     []     = Nothing
+    compare []     _      = Nothing
+    compare _      []     = Nothing
     compare (x:xs) (y:ys) = let res = ds x y
                             in if isNothing res 
                                then compare xs ys

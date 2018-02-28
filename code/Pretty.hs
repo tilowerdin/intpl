@@ -15,6 +15,15 @@ instance Pretty Term where
                                         concatMap ((", "++) . pretty) (tail args) ++ 
                                       ")"
 
+instance Pretty Subst where
+  pretty (Subst []) = "{}"
+  pretty (Subst s)  = "{" ++
+                        prettySubst (head s) ++
+                        concatMap ((", "++) . prettySubst) (tail s) ++
+                      "}"
+                      where 
+                        prettySubst (v, t) = getVar v ++ " -> " ++ pretty t
+
 data Symb = Line | Komma | Not
   deriving (Eq, Show)
 

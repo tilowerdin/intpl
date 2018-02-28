@@ -3,18 +3,6 @@ module Subst where
 import Type
 import Pretty
 
-data Subst = Subst [(VarIndex, Term)]
-  deriving Show
-
-instance Pretty Subst where
-  pretty (Subst []) = "{}"
-  pretty (Subst s)  = "{" ++
-                        prettySubst (head s) ++
-                        concatMap ((", "++) . prettySubst) (tail s) ++
-                      "}"
-                      where 
-                        prettySubst (v, t) = getVar v ++ " -> " ++ pretty t
-
 empty :: Subst
 empty = Subst []
 
