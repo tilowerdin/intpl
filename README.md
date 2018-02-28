@@ -39,9 +39,17 @@ Therefore we create a new module named `Unify.hs`. It gets the following functio
 
 ## Excercise 4 - SLD-Trees
 
-We define a data type `SLDTree = SLDTree Goal [(Subst, SLDTree)]` that represents SLD Trees. 
+We define a data type `SLDTree = SLDTree Goal [(Subst, SLDTree)]` that represents SLD Trees and goes into the module `Type.hs`. 
 The edges between parent and child node are labeled with the mgu that unified the first term of the `Goal` and the `Rule` that we used to derive this `Term`.
 
-We create a new module named `SLDTree.hs` and it get the following function:
+We create a new module named `SLDTree.hs` and it gets the following function:
 * `sld :: Prog -> Goal -> SLDTree` which takes a program p that conatains of several rules and a goal g that we are going to try to resolve. It returns the corresponding SLD Tree given the program p and the goal g.
 
+## Excercise 5 - Strategies
+
+This excercise adds some search strategies to search for substitutions in the SLD Trees.
+A type for startegies is given by `Strategy = SLDTree -> [Subst]`
+The type goes into the module `Type.hs`.
+
+After creating a new module `Strategy.hs` we define the following functions:
+* `dfs :: Strategy` which searches for solutions using the depth first strategy.
