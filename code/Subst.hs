@@ -10,7 +10,7 @@ single :: VarIndex -> Term -> Subst
 single v t = Subst [(v,t)]
 
 apply :: Subst -> Term -> Term
-apply (Subst []) t  = t
+apply (Subst []) t = t
 apply (Subst ((v,t):subs)) (Var i)
   | i == v    = t
   | otherwise = apply (Subst subs) (Var i)

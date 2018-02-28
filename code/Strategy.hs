@@ -16,7 +16,8 @@ dfs (SLDTree (Goal ts) l)  =
                      in Subst $ filter (\(v,_) -> v `elem` vs) s) $
       concatMap (\(s1,sld) -> case dfs sld of
                                 [] -> []
-                                ss -> map (flip compose s1) ss)  l
+                                ss -> map (flip compose s1) ss)  
+                l
 
 appears :: [Term] -> VarIndex -> Bool
 appears ts i = foldl (||) False $ map (go i) ts
@@ -26,7 +27,34 @@ appears ts i = foldl (||) False $ map (go i) ts
 
 
 bfs :: Strategy
-bfs = undefined
+bfs t@(SLDTree (Goal ts) slds) = go [(concatMap getVarsOfTerm ts, 
+                                      Subst [],
+                                      t)]
+  where
+    go :: [([VarIndex],Subst,SLDTree)] -> [Subst]
+    go [] = []
+    go l = let s = concatMap step l
+               ready = map getSubst $ 
+                           filter (\(_,_,z) -> case z of
+                                                 (SLDTree (Goal []) _) -> True
+                                                 otherwise             -> False)
+                                  s
+               notReady = filter (\(_,_,z) -> case z of
+                                                (SLDTree (Goal []) _) -> False
+                                                (SLDTree _ [])        -> False     
+                                                otherwise             -> True)
+                                 s
+           in ready ++ go notReady
+
+    step :: ([VarIndex],Subst,SLDTree) -> [([VarIndex],Subst,SLDTree)]
+    step (vs, s, SLDTree (Goal []) _) = [(vs, s, SLDTree (Goal []) [])]
+    step (vs, s, SLDTree g [])        = [(vs, s, SLDTree g [])]
+    step (vs, s, SLDTree g l)         = map (\(slds, sldt) -> 
+                                              (vs, compose slds s, sldt)) 
+                                            l
+
+    getSubst :: ([VarIndex],Subst,SLDTree) -> Subst
+    getSubst (vs, (Subst s), _) = Subst (filter (\(v,_) -> v `elem` vs) s)
 
 solve :: Strategy -> Prog -> Goal -> [Subst]
 solve = undefined

@@ -27,7 +27,6 @@ instance Pretty Subst where
 data Symb = Line | Komma | Not
   deriving (Eq, Show)
 
--- returns whether | (True) or , (False) is required
 prettyList :: Term -> (Symb, String) 
 prettyList (Var i)           = (Line, "[" ++ pretty (Var i) ++ "]")
 prettyList (Comb "." [h, l])
@@ -37,7 +36,7 @@ prettyList (Comb "." [h, l])
   where 
     erg = prettyList l
 prettyList (Comb "[]" [])    = (Not, "")
-prettyList c                 = (Komma, pretty c)
+prettyList t                 = error(pretty t ++ " is not a list constructor")
 
 getVar :: VarIndex -> String
 getVar i 

@@ -12,16 +12,16 @@ ds (Var v1) t = Just (Var v1, t)
 ds t (Var v2) = Just (Var v2, t)
 ds t1@(Comb s1 l1) t2@(Comb s2 l2)
   | s1 /= s2  = Just (t1,t2)
-  | otherwise = compare l1 l2
+  | otherwise = case length l1 /= length l2 of
+                  True      -> Just (t1,t2)
+                  otherwise -> compare l1 l2
   where
-    compare []     _      = Nothing
-    compare _      []     = Nothing
+    compare []     []     = Nothing
     compare (x:xs) (y:ys) = let res = ds x y
                             in if isNothing res 
                                then compare xs ys
                                else res
 
--- TODO: occurs check
 unify :: Term -> Term -> Maybe Subst
 unify t1 t2 = case ds t1 t2 of 
                 Nothing         -> Just (Subst [])
