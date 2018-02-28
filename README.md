@@ -53,3 +53,4 @@ The type goes into the module `Type.hs`.
 
 After creating a new module `Strategy.hs` we define the following functions:
 * `dfs :: Strategy` which searches for solutions using the depth first strategy.
+* `bfs :: Strategy` which searches in the SLD Tree using the breadth first strategy
