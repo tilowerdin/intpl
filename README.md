@@ -26,7 +26,7 @@ We create a new module named `Subst.hs` that contains the following functions:
 ## Excercise 3 - Unification
 
 We define the unification for two terms t1 and t2. 
-The unification finishes successfully if there is a substitution $\sigma$ such that $\sigma t_1 = \sigma t_2$.
+The unification finishes successfully if there is a substitution $latex \sigma$ such that $latex \sigma t_1 = \sigma t_2$.
 
 Therefore we create a new module named `Unify.hs`. It gets the following functions:
 * `ds :: Term -> Term -> Maybe (Term, Term)` that calculates the disagreement set. The disagreement set contains the leftmost rootmost terms in the given terms t1 and t2 that do not equal to each other. Returned is `Nothing` if such a position does not exist
