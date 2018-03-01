@@ -51,7 +51,7 @@ getNext :: ([(VarIndex, VarIndex)],[VarIndex]) -> VarIndex
 getNext = go 0
   where 
     go i (f,s)
-      | i `elem` s || i `elem` map snd f || i `elem` map fst f = go (i+1) (f,s)
+      | i `elem` s || i `elem` map snd f = go (i+1) (f,s)
       | otherwise = i
 
 getVarsOfTerm :: Term -> [VarIndex]

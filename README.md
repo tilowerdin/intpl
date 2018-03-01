@@ -54,3 +54,4 @@ The type goes into the module `Type.hs`.
 After creating a new module `Strategy.hs` we define the following functions:
 * `dfs :: Strategy` which searches for solutions using the depth first strategy.
 * `bfs :: Strategy` which searches in the SLD Tree using the breadth first strategy
+* `solve :: Strategy -> Prog -> Goal -> [Subst]` which takes one of the Strategies `dfs` or `bfs`, rules encoded in a program, and the goal to proof. Returns substitutions that solve the goal ordered with respect to the given search strategy found in the SLD Tree.
