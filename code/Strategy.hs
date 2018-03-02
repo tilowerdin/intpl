@@ -59,18 +59,12 @@ bfs t@(SLDTree (Goal ts) slds) = go [(concatMap getVarsOfTerm ts,
 solve :: Strategy -> Prog -> Goal -> [Subst]
 solve s = (s .) . sld 
 
+exProg :: Prog
+exProg = Prog [
+              ((Comb "p" [Var 23, Var 25]) :- [(Comb "q" [Var 23, Var 24]), (Comb "p" [Var 24, Var 25])]),
+              ((Comb "p" [Var 23, Var 23]) :- []),
+              ((Comb "q" [Comb "a" [], Comb "b" []] :- []))
+              ]
 
-prog :: Prog
-prog = Prog [ (Comb "=" [Var 0,Var 0]) :- [Comb "True" []],
-              (Comb "=" [Comb "4" [],Comb "4" []] :- []),
-              (Comb "True" [] :- [])
-            ]
-
-goal :: Goal
-goal = (Goal [ Comb "=" [ Var 0,
-                          Var 1
-                        ],
-               Comb "=" [ Var 2,
-                          Comb "hallo" []
-                        ]
-             ])
+exGoal :: Goal
+exGoal = Goal [Comb "p" [Var 18, Comb "b" []]]

@@ -56,3 +56,16 @@ testPretty = pretty (Comb "append" [ Var 0
                                                          ]
                                               ]
                                    ])
+
+instance Eq Term where
+  (==) (Var i) (Var j)         = i == j
+  (==) (Var _) _               = False
+  (==) _       (Var _)         = False
+  (==) (Comb f lf) (Comb g lg) = f == g && lf == lg
+
+instance Pretty Goal where
+  pretty (Goal terms) = concatMap (\t -> pretty t ++ if t == (last terms) then "." else ", ") terms
+
+instance Pretty SLDTree where
+  pretty sldTree = pretty' sldTree 0 where
+    pretty' (SLDTree goal pairs) n = "new Goal: " ++ pretty goal ++ "\n" ++ concatMap (\ (sub, tree) -> (take n) (repeat ' ') ++ "mgu: " ++ pretty sub ++ " " ++ pretty' tree (n+2) ) pairs

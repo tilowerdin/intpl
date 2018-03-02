@@ -3,6 +3,7 @@ module SLDTree where
 import Type
 import Unify
 import Subst
+import Pretty
 
 sld :: Prog -> Goal -> SLDTree
 sld p (Goal [])   = SLDTree (Goal []) []
@@ -18,10 +19,11 @@ sld p g@(Goal ts) =
 findAllDerivations :: Prog -> Goal -> [(Subst, [Term])]
 findAllDerivations (Prog [])     _           = []
 findAllDerivations (Prog (r:rs)) g@(Goal ts) =
-  case testRule (changeVariableNames r ts) (head ts) of 
-    (Just s)  -> (s, map (apply s) (derivation r)) : 
-                 findAllDerivations (Prog rs) g
-    otherwise -> findAllDerivations (Prog rs) g
+  let r' = changeVariableNames r ts
+  in case testRule r' (head ts) of 
+       (Just s)  -> (s, map (apply s) (derivation r')) : 
+                    findAllDerivations (Prog rs) g
+       otherwise -> findAllDerivations (Prog rs) g
 
 changeVariableNames :: Rule -> [Term] -> Rule
 changeVariableNames (r :- rs) ts = 
@@ -84,3 +86,4 @@ testSLDTree g = let p = Prog [ (Comb "=" [Var 0,Var 0]) :- [Comb "True" []],
                                (Comb "True" [] :- [])
                              ]
                 in sld p g
+
