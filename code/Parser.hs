@@ -4,6 +4,7 @@ module Parser
 
 import System.IO.Error (catchIOError)
 
+-- cabal install parsec
 import Text.Parsec hiding (parse)
 
 import Type

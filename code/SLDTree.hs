@@ -1,71 +1,55 @@
-module SLDTree where
+-- |module to create an SLD Tree of a goal to proof.
+module SLDTree
+  ( sld
+  ) where
 
 import Type
 import Unify
 import Subst
 import Pretty
+import Data.Maybe
+import Data.List
 
+-- |creates an SLD Tree from a given program and a given goal to proof
 sld :: Prog -> Goal -> SLDTree
-sld p (Goal [])   = SLDTree (Goal []) []
-sld p g@(Goal ts) = 
-  let l = findAllDerivations p g
-  in SLDTree g 
-             (map (\(s, tss) -> (,) s $ 
-                                    sld p $ 
-                                        Goal $ map (apply s) $ 
-                                                   tss ++ (tail ts)) 
-                  l)
+sld p              (Goal [])   = SLDTree (Goal []) []
+sld p@(Prog rules) g@(Goal ts) = SLDTree g derivations
+ where
+  derivations = catMaybes $ map getDerivation rules
 
-findAllDerivations :: Prog -> Goal -> [(Subst, [Term])]
-findAllDerivations (Prog [])     _           = []
-findAllDerivations (Prog (r:rs)) g@(Goal ts) =
-  let r' = changeVariableNames r ts
-  in case testRule r' (head ts) of 
-       (Just s)  -> (s, map (apply s) (derivation r')) : 
-                    findAllDerivations (Prog rs) g
-       otherwise -> findAllDerivations (Prog rs) g
+  getDerivation :: Rule -> Maybe (Subst, SLDTree)
+  getDerivation r = let (rH :- rB) = getDistinctRule r
+                        s          = unify (head ts) rH
+                    in case s of
+                         Nothing -> Nothing
+                         Just s  -> Just (s, sld p (Goal (map (apply s) 
+                                                              (rB ++ (tail ts)))))
 
-changeVariableNames :: Rule -> [Term] -> Rule
-changeVariableNames (r :- rs) ts = 
-    let vsot     = concatMap getVarsOfTerm ts
-        (r',_)   = replaceVars r ([],vsot)
-        (Just s) = unify r r'
-    in (apply s r) :- map (apply s) rs
+  getDistinctRule :: Rule -> Rule
+  getDistinctRule (rH :- rB) = let varsOfRule = nub $ concatMap getVarsOfTerm (rH:rB)
+                                   varsOfGoal = nub $ concatMap getVarsOfTerm ts
+                                   inte = intersect varsOfGoal varsOfRule
+                                   unio = union varsOfRule varsOfGoal
+                                   subst = getSubst inte unio
+                               in (apply subst rH) :- (map (apply subst) rB)
 
-replaceVars :: Term -> ([(VarIndex,VarIndex)],[VarIndex]) -> (Term, ([(VarIndex,VarIndex)],[VarIndex]))
-replaceVars (Var v)     vl = case getSub v (fst vl) of
-                              Just v' -> ((Var v'),vl)
-                              Nothing -> let next = getNext vl
-                                         in (Var next, ((v,next):(fst vl),snd vl))
-replaceVars (Comb s []) vl = (Comb s [],vl)
-replaceVars (Comb s ts) vl = let (t,vl1)           = replaceVars (head ts) vl
-                                 (Comb _ ts', vl2) = 
-                                   replaceVars (Comb s (tail ts)) vl1
-                             in (Comb s (t:ts'),vl2)
+  getVarsOfTerm :: Term -> [VarIndex]
+  getVarsOfTerm (Var i)     = [i]
+  getVarsOfTerm (Comb _ ts) = concatMap getVarsOfTerm ts
 
-getSub :: VarIndex -> [(VarIndex, VarIndex)] -> Maybe VarIndex
-getSub _ [] = Nothing
-getSub i ((v1,v2):vs)
-  | i == v1   = Just v2
-  | otherwise = getSub i vs
+  getSubst :: [VarIndex] -> [VarIndex] -> Subst
+  getSubst []     _    = empty
+  getSubst (x:xs) used = let newX = getUnused 0 used
+                         in compose (single x (Var newX)) (getSubst xs (newX:used))
 
-getNext :: ([(VarIndex, VarIndex)],[VarIndex]) -> VarIndex
-getNext = go 0
-  where 
-    go i (f,s)
-      | i `elem` s || i `elem` map snd f = go (i+1) (f,s)
-      | otherwise = i
-
-getVarsOfTerm :: Term -> [VarIndex]
-getVarsOfTerm (Var v)     = [v]
-getVarsOfTerm (Comb _ ts) = concatMap getVarsOfTerm ts
+  getUnused :: VarIndex -> [VarIndex] -> VarIndex
+  getUnused startIndex used
+    | startIndex `elem` used = getUnused (startIndex+1) used
+    | otherwise              = startIndex
 
 
-testRule :: Rule -> Term -> Maybe Subst
-testRule (r :- _) t = unify t r
 
-derivation :: Rule -> [Term]
-derivation (_ :- d) = d
+
 
 -- take first element of Goal
 -- search for all rules that can be applied which means unified
@@ -87,3 +71,12 @@ testSLDTree g = let p = Prog [ (Comb "=" [Var 0,Var 0]) :- [Comb "True" []],
                              ]
                 in sld p g
 
+exProg :: Prog
+exProg = Prog [
+              ((Comb "p" [Var 23, Var 25]) :- [(Comb "q" [Var 23, Var 24]), (Comb "p" [Var 24, Var 25])]),
+              ((Comb "p" [Var 23, Var 23]) :- []),
+              ((Comb "q" [Comb "a" [], Comb "b" []] :- []))
+              ]
+
+exGoal :: Goal
+exGoal = Goal [Comb "p" [Var 18, Comb "b" []]]

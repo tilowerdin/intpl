@@ -1,4 +1,7 @@
-module Unify where
+-- |module for unification of to terms
+module Unify 
+  ( unify
+  ) where
 
 import Type
 import Subst
@@ -11,18 +14,20 @@ ds (Var v1) (Var v2)
 ds (Var v1) t = Just (Var v1, t)
 ds t (Var v2) = Just (Var v2, t)
 ds t1@(Comb s1 l1) t2@(Comb s2 l2)
-  | s1 /= s2  = Just (t1,t2)
-  | otherwise = case length l1 /= length l2 of
-                  True      -> Just (t1,t2)
-                  otherwise -> compare l1 l2
+  | s1 /= s2 || length l1 /= length l2 = Just (t1,t2)
+  | otherwise = compare l1 l2
   where
     compare []     []     = Nothing
     compare (x:xs) (y:ys) = let res = ds x y
-                            in if isNothing res 
-                               then compare xs ys
-                               else res
+                            in case res of 
+                                 Nothing -> compare xs ys
+                                 _       -> res
 
-unify :: Term -> Term -> Maybe Subst
+-- |unify term t1 and term t2 with each other. if they are unifiable the mgu
+-- of these terms is return otherwise Nothing
+unify :: Term    -- ^term t1
+      -> Term    -- ^term t2
+      -> Maybe Subst
 unify t1 t2 = case ds t1 t2 of 
                 Nothing         -> Just (Subst [])
                 Just (Var v, t) -> let s = single v t

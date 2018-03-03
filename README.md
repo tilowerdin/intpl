@@ -55,3 +55,15 @@ After creating a new module `Strategy.hs` we define the following functions:
 * `dfs :: Strategy` which searches for solutions using the depth first strategy.
 * `bfs :: Strategy` which searches in the SLD Tree using the breadth first strategy
 * `solve :: Strategy -> Prog -> Goal -> [Subst]` which takes one of the Strategies `dfs` or `bfs`, rules encoded in a program, and the goal to proof. Returns substitutions that solve the goal ordered with respect to the given search strategy found in the SLD Tree.
+
+## Excercise 6 - interactive Environment
+
+This excercise adds some IO to the program such that it look like swipl.
+The module `Main.hs` contains a `main` function that does all that stuff.
+What you can enter are the following commands:
+* `<goal>` that should be in prolog syntax and this is going to be proved.
+* `:help` which shows a help message that contains this list of commands.
+* `:info` which displays the available predicates.
+* `:load <file>` which loads the specified prolog file with the rules inside
+* `:quit` which exits the environment
+* `:set <strat>` which sets the strategy and should be 'bfs' or 'dfs'
