@@ -66,10 +66,11 @@ main = do
       Right p' -> return p'
 
   exe :: Strategy -> Prog -> String -> IO ()
-  exe strat prog s = case parse s :: Either String Goal of
-                       Left s  -> putStrLn s
-                       Right g -> printSol $ map pretty 
-                                           $ solve strat prog g
+  exe strat prog s = 
+    case parseWithVars s :: Either String (Goal, [(VarIndex, String)]) of
+      Left  s         -> putStrLn s
+      Right (g, inds) -> printSol $ map (prettyWithVars inds) 
+                                  $ solve strat prog g
 
   printSol :: [String] -> IO ()
   printSol []     = do putStrLn "Nothing"

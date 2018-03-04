@@ -67,3 +67,9 @@ What you can enter are the following commands:
 * `:load <file>` which loads the specified prolog file with the rules inside
 * `:quit` which exits the environment
 * `:set <strat>` which sets the strategy and should be 'bfs' or 'dfs'
+
+## Excercise 7 - improved pretty printig
+
+The problem is that the given code renames Variables in the program and in the goal.
+Whis problem can be solved by not using the given function `parse` but `parseWithVars` which return not only the parsed goal, but also a key value list with variable indices to original identifier.
+Using this function while parsing, we can get the original variable names when it comes to printing the found substitutions by writing a function `prettyWithVars` in the `Pretty` class.
